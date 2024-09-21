@@ -1,0 +1,95 @@
+/* Styles for authentication forms */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f9;
+}
+
+.auth-container h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Form Container */
+.auth-container .login-form,
+.auth-container .signup-form {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Group */
+.auth-container .form-group {
+  margin-bottom: 20px;
+}
+
+.auth-container .form-label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+/* Input Styles */
+.auth-container .form-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border 0.3s ease;
+}
+
+.auth-container .form-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Button Styles */
+.auth-container .form-actions {
+  text-align: center;
+}
+
+.auth-container .submit-btn {
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.auth-container .submit-btn:hover {
+  background-color: #218838;
+}
+
+/* Devise Links */
+.auth-container .devise-links {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.auth-container .devise-links a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-container .devise-links a:hover {
+  text-decoration: underline;
+}
+
+
+/*
+ *= require custom
+*/

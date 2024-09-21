@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    /* Button Styles */
+    #addStudentButton {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #addStudentButton:hover {
+      background-color: #45a049;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    td {
+      color: #333;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #ddd;
+    }
+
+    /* Edit/Delete Button Styles */
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .btn-danger {
+      background-color: #f44336;
+    }
+
+    .btn-danger:hover {
+      background-color: #e53935;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    #formErrors {
+      margin-top: 10px;
+      color: red;
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1>tailwebs.</h1>
+
+<!-- Button to open the add student modal -->
+<button id="addStudentButton">Add Student</button>
+
+<!-- Table to display students -->
+<table id="studentTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Subject</th>
+      <th>Marks</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @students.each do |student| %>
+      <tr data-student-id="<%= student.id %>">
+        <td><%= student.name %></td>
+        <td><%= student.subject %></td>
+        <td><%= student.marks %></td>
+        <td>
+          <button onclick="editStudent(<%= student.id %>)">Edit</button>
+          <button onclick="deleteStudent(<%= student.id %>)" class="btn-danger">Delete</button>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<!-- Modal for adding/editing students -->
+<div id="studentModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <form id="studentForm">
+      <div id="formErrors"></div>
+      <label for="student_name">Name:</label>
+      <input type="text" id="student_name" name="student[name]" required>
+      
+      <label for="student_subject">Subject:</label>
+      <input type="text" id="student_subject" name="student[subject]" required>
+      
+      <label for="student_marks">Marks:</label>
+      <input type="number" id="student_marks" name="student[marks]" required>
+      
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+
+<% if user_signed_in? %>
+  <%= link_to 'Logout', destroy_user_session_path, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+<% end %>
+
+<script>
+  // JavaScript functions for CRUD operations
+  // JavaScript functions for CRUD operations
+
+// Function to show the add/edit student modal
+function showStudentModal(student = null) {
+  const modal = document.getElementById('studentModal');
+  const form = document.getElementById('studentForm');
+  const title = document.getElementById('modalTitle');
+
+  // Clear previous form data
+  form.reset();
+
+  if (student) {
+    // Editing existing student
+    title.textContent = 'Edit Student';
+    form.elements['student[name]'].value = student.name;
+    form.elements['student[subject]'].value = student.subject;
+    form.elements['student[marks]'].value = student.marks;
+    form.action = `/students/${student.id}`;
+    form.method = 'post';
+    form.innerHTML += '<input type="hidden" name="_method" value="patch">';
+  } else {
+    // Adding new student
+    title.textContent = 'Add New Student';
+    form.action = '/students';
+    form.method = 'post';
+  }
+
+  modal.style.display = 'block';
+}
+
+// Function to close the modal
+function closeModal() {
+  const modal = document.getElementById('studentModal');
+  modal.style.display = 'none';
+}
+
+// Function to edit a student
+function editStudent(id) {
+  fetch(`/students/${id}.json`)
+    .then(response => response.json())
+    .then(student => {
+      showStudentModal(student);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Function to delete a student
+function deleteStudent(id) {
+  if (confirm('Are you sure you want to delete this student?')) {
+    fetch(`/students/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Remove the student row from the table
+        document.querySelector(`tr[data-student-id="${id}"]`).remove();
+      } else {
+        alert('Failed to delete student');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+}
+
+// Function to show the add student modal
+function showAddModal() {
+  showStudentModal();
+}
+
+// Function to handle form submission
+function handleFormSubmit(event) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: form.method,
+    body: formData,
+    headers: {
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Close the modal
+      closeModal();
+      // Refresh the student list or update the specific row
+      location.reload(); // This is a simple solution; for a more dynamic approach, update only the affected row
+    } else {
+      // Display error messages
+      const errorDiv = document.getElementById('formErrors');
+      errorDiv.innerHTML = data.errors.join('<br>');
+      errorDiv.style.display = 'block';
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const addButton = document.getElementById('addStudentButton');
+  const form = document.getElementById('studentForm');
+  const closeButton = document.querySelector('.close');
+
+  if (addButton) addButton.addEventListener('click', showAddModal);
+  if (form) form.addEventListener('submit', handleFormSubmit);
+  if (closeButton) closeButton.addEventListener('click', closeModal);
+});
+</script>

@@ -1,0 +1,37 @@
+.auth-links-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.auth-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.omniauth-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.omniauth-btn:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+.omniauth-btn:focus {
+  outline: none;
+}
