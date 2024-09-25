@@ -7,7 +7,24 @@ class StudentsController < ApplicationController
   end
 
   def create
-    
+  # Check if a student with the same name and subject already exists
+  existing_student = current_user.students.find_by(name: student_params[:name], subject: student_params[:subject])
+
+  if existing_student
+    # If student exists, update the marks by adding the new marks to the existing marks
+    if existing_student.update(marks: existing_student.marks + student_params[:marks].to_i)
+      respond_to do |format|
+        format.html { redirect_to students_path, notice: "Record updated for #{existing_student.name}." }
+        format.json { render json: { success: true, student: existing_student }, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.html { render :new }
+        format.json { render json: { success: false, errors: existing_student.errors.full_messages }, status: :unprocessable_entity }
+      end
+    end
+  else
+    # If no existing student, create a new student record
     @student = current_user.students.new(student_params)
 
     respond_to do |format|
@@ -20,6 +37,8 @@ class StudentsController < ApplicationController
       end
     end
   end
+end
+
 
   def update
     respond_to do |format|
